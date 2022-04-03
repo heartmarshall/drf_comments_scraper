@@ -102,17 +102,17 @@ try:
 except FileExistsError:
     pass
 
-
 print("Формирую список статей...")
 content_links = get_all_links_by_class(url, "content-link")
 articles = []
 
 try:  # TODO повторяющийся код...
-    processed_links_file = open("processed_links.txt", "a")
-    processed_links_list = processed_links_file.read()
+    processed_links_file = open("processed_links.txt", "r+")
+    processed_links_list = processed_links_file.read().split("\n")
 except io.UnsupportedOperation:
     processed_links_file = open("processed_links.txt", "w")
     processed_links_list = ""
+print(processed_links_list)
 for link in tqdm(content_links):
     if link not in processed_links_list:
         articles.append(get_article_data(link))
@@ -122,7 +122,7 @@ processed_links_file.close()
 print("Начинаю обрабатывать комментарии...")
 for article in tqdm(articles):
     article.get_comments()
-    with open(os.path.join(download_dir, article.work_name)+ '.txt', "w") as output:
+    with open(os.path.join(download_dir, article.work_name) + '.txt', "w") as output:
         output.write("Заголовок: {}\nПросмотров: {}\nТеги:{}\n".format(article.header, article.views, article.tags))
         for comment in article.comments:
             output.write(comment + "\n")
